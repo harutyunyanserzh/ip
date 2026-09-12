@@ -27,13 +27,13 @@ Find the IPv4 address of the server.
 Write it here:
 
 ```text
-IP address:
+IP address:212.34.250.14
 ```
 
 Also find the network mask.
 
 ```text
-Network mask:
+Network mask:255.255.255.240
 ```
 
 You have already seen Ethernet addresses before.
@@ -41,7 +41,7 @@ You have already seen Ethernet addresses before.
 Find the Ethernet address of `eth0` too.
 
 ```text
-Ethernet address:
+Ethernet address:58:9c:fc:01:f0:a5
 ```
 
 Notice that the same interface has both:
@@ -76,7 +76,7 @@ What is the gateway for the default route?
 Write it here:
 
 ```text
-Default gateway:
+Default gateway:212.34.250.9
 ```
 
 The default gateway is the router to which the server sends packets when their destination is not on the local network.
@@ -148,6 +148,7 @@ At that point, the router does **not** forward the packet.
 Instead, it normally sends an ICMP message back to us saying that the TTL has expired.
 
 Why do you think IP needs this mechanism?
+To prevent packets from looping infinitely around the networkk if a routing loop occurs.
 
 Think about what could happen if routers accidentally formed a loop.
 
@@ -184,6 +185,7 @@ TTL = 1
 ```
 
 Did `8.8.8.8` answer?
+no
 
 Probably not.
 
@@ -196,10 +198,11 @@ Time to live exceeded
 Write down the IP address of the machine that answered:
 
 ```text
-TTL 1:
+TTL 1:212.34.250
 ```
 
 What machine do you think this is?
+Default gateway router
 
 Compare it with the default gateway you found earlier.
 
@@ -216,7 +219,7 @@ ping -c 1 -t 2 8.8.8.8
 Write down the address that answered:
 
 ```text
-TTL 2:
+TTL 2:169.254.1.1
 ```
 
 Now try:
@@ -226,7 +229,7 @@ ping -c 1 -t 3 8.8.8.8
 ```
 
 ```text
-TTL 3:
+TTL 3:185.48.241.8
 ```
 
 Continue:
@@ -239,9 +242,9 @@ ping -c 1 -t 5 8.8.8.8
 Write down what you see.
 
 ```text
-TTL 4:
+TTL 4:185.48.240.56
 
-TTL 5:
+TTL 5:185.48.240.57
 ```
 
 You can continue with larger TTL values if you want.
@@ -275,6 +278,7 @@ remember who answers
 ```
 
 What would that program show us?
+IP addresses of all the intermediate routers along the network path that a packet passes through on its way to the final destination
 
 It would show us the routers through which our packets travel.
 
@@ -311,13 +315,15 @@ Each numbered line represents another hop along the path.
 Compare this output with the addresses you discovered manually using different TTL values.
 
 Do they correspond?
+yes
 
 ```text
 What was hop 1?
-
+212.34.250.9 
 What was hop 2?
-
+169.254.1.1
 What was hop 3?
+185.48.241.8
 ```
 
 You may also see:
@@ -327,6 +333,7 @@ You may also see:
 ```
 
 Does this necessarily mean that packets stopped there?
+no
 
 Look at whether later hops still answer.
 
@@ -357,6 +364,8 @@ traceroute 8.8.8.8
 ```
 
 What is different?
+The command traceroute -n 8.8.8.8 displays raw numerical IP addresses only, but traceroute 8.8.8.8 attempts to resolve and display domain hostnames
+
 
 Without `-n`, traceroute may show names such as:
 
@@ -489,31 +498,33 @@ Write down the first few hops from both networks.
 ```text
 Server:
 
-1.
-2.
-3.
-4.
+1. 212.34.250.9
+2. 169.254.1.1
+3. 185.48.241.8
+4. 185.48.240.56
 
 Lab Windows machine:
 
-1.
-2.
-3.
-4.
+1. 192.168.1.1
+2. 10.0.0.1
+3. 185.48.241.8
+4. 185.48.240.56
 
 
 
 University Wi-Fi:
 
-1.
-2.
-3.
-4.
+1. 10.10.0.1
+2. 10.0.0.1
+3. 185.48.241.8
+4. 185.48.240.56
 ```
 
 Where do the two paths become different?
+They differ right at the first local hop because each network uses a different local gateway router.
 
 Do they later appear to join the same network again?
+yes
 
 ---
 
@@ -528,7 +539,7 @@ When you send a packet to `8.8.8.8`, does your computer need to know the entire 
 Or does it only need to know where to send the packet **next**?
 
 ```text
-Answer:
+Answer: No, it does not need to know the entire path. It only needs to know the next hop
 ```
 
 ### Question 2
@@ -536,7 +547,7 @@ Answer:
 What happens to TTL when an IP packet passes through a router?
 
 ```text
-Answer:
+Answer: Each router that forwards the packet decreases the TTL value by 1
 ```
 
 ### Question 3
@@ -544,7 +555,7 @@ Answer:
 What happens when TTL reaches zero?
 
 ```text
-Answer:
+Answer: The router drops the packet and sends an ICMP "Time to Live Exceeded" error message back to the original sender
 ```
 
 ### Question 4
@@ -554,7 +565,7 @@ Why is TTL necessary?
 What could happen without it if routers accidentally created a routing loop?
 
 ```text
-Answer:
+Answer: TTL prevents packets from endlessly circulating in the network. Without TTL, packets trapped in a routing loop would loop forever, consuming all network bandwidth and crashing network devices
 ```
 
 ### Question 5
@@ -564,7 +575,7 @@ How can traceroute discover routers between you and a destination?
 Explain it using TTL.
 
 ```text
-Answer:
+Answer: Traceroute sends a sequence of packets with incrementally increasing TTL values (TTL = 1, 2, 3, ...). Each router along the path drops the packet when its TTL reaches 0 and sends back an ICMP reply, revealing that router's IP address step-by-step
 ```
 
 ### Question 6
@@ -582,7 +593,7 @@ university Wi-Fi -> 8.8.8.8
 ```
 
 ```text
-Answer:
+Answer:They start on different physical networks with different local gateways, subnets, and ISPs, which dynamically choose different optimal routing paths.
 ```
 
 ---
@@ -617,11 +628,11 @@ Compare the result with the address shown by:
 Are they the same?
 
 ```text
-Address on eth0:
+Address on eth0: 212.34.250.14
 ```
 
 ```text
-Address that the website detects
+Address that the website detects: 5.77.132.203
 ```
 
 Now do
@@ -638,11 +649,11 @@ Is the IP same?
 Write down:
 
 ```text
-Address on eth0:
+Address on eth0: 212.34.250.14
 ```
 
 ```text
-Address that the website detects
+Address that the website detects: 5.77.132.203
 ```
 
 
@@ -707,6 +718,6 @@ And the route to the same destination can be different depending on where the pa
 Bonus question:
 Why operating systems limit TTL by fairly small numbers? For Linux and MacOS it is 64, for Windows it is 128.
 
-Speculate below:
+Speculate below: Most Internet routes require fewer than 30 hops to reach any global destination. Setting default TTL limits to modest values like 64 or 128 ensures that if a routing loop occurs, rogue packets are discarded quickly rather than endlessly consuming router memory and link bandwidth for up to 255 hops.
 
 
